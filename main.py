@@ -7,6 +7,8 @@ global specialFlag
 specialFlag=0
 global feFlag
 feFlag=0
+global doFlag
+doFlag=0
 global ifFlag
 ifFlag=0
 #check
@@ -16,12 +18,14 @@ global nextToken
 nextToken=''
 global indexKeep
 indexKeep=0
+global setype
+setype=0
 
 rarray=["abstract","continue","new","switch","assert","default","goto","package","synchronized","boolean","private","this","break","double","implements","protected","throw","byte","import","public","throws","case","enum","instanceof","return","transient","catch","extends","short","try","char","final","interface","static","void","class","finally","long","strictfp","volatile","const","native","super"]
 
 earray=["do","if","while","for","int","float","switch","else"]
 
-type=["int", "float", "double","char","boolean"]
+typer=["int", "float", "double","char","boolean"]
 
 scarray=['``','\'\'','~','!','#','$','%','^','&','*','(',')','_','+',',','.','/','|','\\','\'','-','=','<','>','?','{','}','[',']',':',';']
 
@@ -32,6 +36,9 @@ stack=[]
 
 #keeps track of special statement until end
 specialArray=[]
+
+#keep track of statement 
+statementArray=[]
 
 #hold next lexeme
 holdNext=[]
@@ -61,6 +68,7 @@ assign_statement=71
 #valid assignment check the declared array for the UID '='
 
 def printNclear(stmt):
+  
   global specialFlag
   specialFlag=0
   global feFlag
@@ -73,7 +81,12 @@ def printNclear(stmt):
         lex(lexeme)
       else:
         print(lexeme)
+  elif(stmt=='do_stmt'):
+    for lexeme in specialArray:
+      lex(lexeme)
   specialArray.clear()
+  global doFlag
+  doFlag=0
 
 
 
@@ -94,10 +107,14 @@ def error():
 
 
 
-def statement():
-  print('statement')
-
-
+def statement(lexeme):
+  if(lexeme!=';'):
+    if(lexeme=='='):
+      print('ASSIGNMENT')
+    else:
+      print('STATEMENT')
+  else:
+    print('end STATEMENT')
 
 def condition():
   print('condition')
@@ -163,21 +180,30 @@ def for_stmt(lexeme):
     printNclear('for_stmt')
     lex(lexeme)
     
+def while_stmt(lexeme):
+  print('petite')
 
 def do_stmt(lexeme):
   if(len(specialArray)==0):
-    
     if(lexeme == '{'):
       specialArray.append(lexeme)
     else:
       error()
-  elif('}' not in specialArray):
+  elif('}' not in specialArray)or ('while' not in specialArray):
     specialArray.append(lexeme)
-  elif('}' in specialArray)and ('while' not in specialArray):
+    print(specialArray)
+  
+  elif('}' in specialArray) and ('while' in specialArray) and (lexeme != '}'):
     specialArray.append(lexeme)
-  else:
+    print(specialArray)
+  elif(lexeme == '}'):
+    
+    specialArray.append(lexeme)
     printNclear('do_stmt')
     lex(lexeme)
+  else:
+    
+    error()
 
 def if_stmt():
   print('if')
@@ -194,13 +220,17 @@ def process(curStmt,lexeme):
   elif(curStmt=='do'):
     do_stmt(lexeme)
   elif(curStmt=='while'):
-    specialArray.append(lexeme)
+    while_stmt(lexeme)
   elif(curStmt=='if'):
-    if_stmt()
+    if_stmt(lexeme)
   elif(curStmt=='else'):
-    else_stmt()
+    else_stmt(lexeme)
   elif(curStmt=='switch'):
-    switch_stmt()
+    switch_stmt(lexeme)
+
+def setDo():
+  global doFlag
+  doFlag=1
 
 def special(lexeme):
   if(feFlag==1):
@@ -210,11 +240,14 @@ def special(lexeme):
     curStmt='for'
     print(lexeme + " is token " +str(for_statement))
   elif(lexeme=="do"):
+    setDo()
     curStmt='do'
     print(lexeme + " is token " +str(do_statement))
+  elif(lexeme=='while')and(doFlag==1):
+      print(lexeme + " is tokeooon " +str(do_statement))
   elif(lexeme=='while'):
-    curStmt='while'
-    print(lexeme + " is token " +str(while_statement))
+      curStmt='while'
+      print(lexeme + " is token " +str(while_statement))
   elif(lexeme=='if'):
     curStmt='if'
     print(lexeme + " is token " +str(if_statement))
@@ -251,13 +284,23 @@ def needToPair(special):
 def setSpecial():
   global specialFlag
   specialFlag=1
+
+def setTYPE():
+  global setype
+  setype=1
+
+def unsetTYPE():
+  global setype
+  setype=0
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #3. categorize
 def lex(lexeme):
   #still continues special statement processing 
-  if(specialFlag==1):
+  if(specialFlag==1)and(doFlag==0):
     #categorizes the statement based on statement syntax
     process(curStmt,lexeme)
+  elif(setype==1)and(lexeme==';'):
+    statement(lexeme)
   #SPECIAL CHAR
   elif(lexeme in scarray):
     #place the special char if its ( { '  [ to be ) } '  ] onto stack 
@@ -277,6 +320,10 @@ def lex(lexeme):
   #finds if reserved word
   elif(lexeme in rarray):
     print(lexeme+' is token '+ str(keyword))
+    if(lexeme in typer):
+      setTYPE()
+      statement(lexeme)
+      unsetTYPE()
   #finds if user ident
   elif(bool(re.match("[a-zA-Z|_a-zA-Z][_0-9a-zA-Z]", lexeme))):
     print(lexeme + " is token " +str(user_defined_identifier))

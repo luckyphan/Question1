@@ -1,0 +1,20 @@
+
+VOID MAIN ()
+{
+  
+for ( jfkls ; skljf; jfslk) {
+String str = she is cool;
+}
+
+do{
+  System.out.println("She is nice");
+}while(boolean)
+
+while(boolean g == true){
+  int s = 56;
+}
+
+int Tool(){
+  
+}
+}
