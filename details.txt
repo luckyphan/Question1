@@ -1,0 +1,68 @@
+imagne teh file has main function with a body :
+
+<block> ‘{‘ { <statement> ; } ‘}’
+
+within the body
+• switch
+• foreach
+• for
+• while
+• do-while
+• block !!‘{‘ { <statement> ; } ‘}’
+• if
+• assignment
+• return
+
+
+**if start with '(' must end with ')'
+                ' must end with '
+                " must end with "
+                '{' must end with '}'
+  each assignment line must have = and end with ;
+  return must have not null and end with ;
+
+ 
+STATEMENTS
+def for_stmt:
+def forEach_stmt:
+def doWhile_stmt:
+def while_stmt:
+def if_stmt:
+def switch_stmt:
+
+def typeMatch:
+  makes sure the types in the statement match
+def declared:
+  UID needs to be declared and initialized before used
+def assignment_stmt:
+  UID needs to be declared before assigned or within the statement
+def return_stmt: 
+  can return anything but symbol and reserved words
+
+# for (expr1;expr2;expr3) block
+for ( TYPE UID : <array> ) block
+# do  block 
+# 	while ( <condition> ) 
+# while( <condition> ) block 
+# if ( <condition> ) block 
+# 	else  block     NOT REQUIRED FOR IF ALONE
+# switch (<condition>){
+  case n:   <statements>
+            break;
+  ....
+  default:  <statements>
+            break;    OPTIONAL
+}
+#statement
+  can be declaration or assignment or initialized
+  DECLARATION uses TYPE array and the next token is UID (check syntax for correct) then UID is placed in declared array
+  ASSIGNMENT uses the declared array check if UID is declared and then followed by = and something else until ;
+  initializedis where there is both: declare and assignment where TYPE array and the next token is UID (check syntax for correct) then UID is placed in declared array then followed by = and something else until ;
+
+#FLAGS
+  feFlag looks for : to indicate for each
+  
+++  must seperate each lexeme by space
+    
+    holdNext=[]
+    use holdNext[] to keep track of the next lexemes 
